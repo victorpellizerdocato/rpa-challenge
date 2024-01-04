@@ -10,8 +10,8 @@ from dateutil.relativedelta import relativedelta
 
 class DataHandling:
     def get_last_acceptable_date(
-        months_delta
-    ):
+        months_delta: int
+    ) -> datetime:
         print("Defining the last month to look for news.")
         now = datetime.utcnow()
         if months_delta <= 1:
@@ -20,8 +20,8 @@ class DataHandling:
         return last_acceptable_date
 
     def date_filter(
-        date
-    ):
+        date: str
+    ) -> datetime:
         print("Converting the news' date format to datetime format.")
         months = {
             'Jan': 1,
@@ -44,24 +44,25 @@ class DataHandling:
         return filtered_date
 
     def download_file(
-        url
-    ):
+        url: str
+    ) -> str:
+        print("Downloading the new's image.")
         download_response = requests.get(
-            url=url,
+            url=url
         )
         if download_response and download_response.status_code != 200:
-            raise Exception('Download failure')
+            return ''
 
         path = f'./cache/file-{round(random.random() * (9999) + 1)}.png'
         open(path, "wb").write(download_response.content)
-        print('File downloaded sucessfully.')
 
         return os.path.abspath(path)
 
     def build_sheet(
-        extracted_data,
-        file_path
-    ):
+        extracted_data: list,
+        sheet_name: str
+    ) -> str:
+        print("Building sheet with the extracted data.")
         header = [
             'picture_filename',
             'title',
@@ -108,5 +109,6 @@ class DataHandling:
                     value=process[header[index]]
                 )
 
-        wb.save(file_path)
-        return file_path
+        sheet_path = f'./cache/{sheet_name}.xlsx'
+        wb.save(sheet_path)
+        return sheet_path
