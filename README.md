@@ -1,7 +1,7 @@
 # rpa-challenge
 > Code to demonstrate my knowledge in Python RPA development.
 
-> This robot accesses a given general news website, apply some filters and then gather information from news.
+This robot accesses a given general news website, apply some filters and then gather information from news.
 
 ## PARAMS
 It receives a dict with 3 indexes:
@@ -12,7 +12,7 @@ topic - the news topic
 
 months_delta - number of months for which you need to receive news
 
-# FEATURES ON v1.0
+## Features on v1.0
 1. Opens https://www.latimes.com/
 2. Inserts query, topic and order news by Newest
 3. Downloads the new's image and saves its path
