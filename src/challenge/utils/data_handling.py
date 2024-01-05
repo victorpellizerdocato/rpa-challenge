@@ -44,7 +44,8 @@ class DataHandling:
         return filtered_date
 
     def download_file(
-        url: str
+        url: str,
+        date: str
     ) -> str:
         print("Downloading the new's image.")
         download_response = requests.get(
@@ -53,7 +54,7 @@ class DataHandling:
         if download_response and download_response.status_code != 200:
             return ''
 
-        path = f'./cache/file-{round(random.random() * (9999) + 1)}.png'
+        path = f'./cache/image-{date}-{random.randint(100000,999999)}.png'
         open(path, "wb").write(download_response.content)
 
         return os.path.abspath(path)

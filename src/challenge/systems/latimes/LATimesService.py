@@ -78,7 +78,7 @@ class LATimes():
 
         sheet_path = self.data_handling.build_sheet(
             extracted_data=extracted_data,
-            sheet_name=f"{package['topic']}_{quote(package['query'])}_{package['months_delta']}_delta"
+            sheet_name=f"{package['topic']}_{quote(package['query'])}_delta_{package['months_delta']}"
         )
         if sheet_path:
             print(f"Successfully created the datasheet {sheet_path}.")
@@ -133,7 +133,8 @@ class LATimes():
 
         if new.child.child.child.last_child: # checks if a new has an image
             news_object['picture_filename'] = self.data_handling.download_file(
-                url=new.child.child.child.last_child.prev.attributes['src']
+                url=new.child.child.child.last_child.prev.attributes['src'],
+                date=date.strftime("%Y_%m_%d")
             )
         if not news_object['picture_filename']:
             print("The robot failed to download the new's image.")
