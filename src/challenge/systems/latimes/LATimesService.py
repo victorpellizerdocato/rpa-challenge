@@ -1,14 +1,9 @@
+import html
 import requests
 from datetime import datetime
-from bs4 import BeautifulSoup
+from selectolax.parser import HTMLParser
 from urllib.parse import quote_plus, quote
 from src.challenge.utils.data_handling import DataHandling
-
-
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from selenium.webdriver import ActionChains
 
 
 class LATimes():
@@ -65,11 +60,12 @@ class LATimes():
             months_delta=package['months_delta']
         )
 
-        site_html = BeautifulSoup(request_response.text, 'html.parser')
-        news = site_html.select('.promo-wrapper')
+        site_html = HTMLParser(request_response.text)
+
+        news = site_html.css(".promo-wrapper")
         extracted_data = []
         for new in news:
-            news_date = self.data_handling.date_filter(date=new.contents[0].next_sibling.contents[2].next)
+            news_date = self.data_handling.date_filter(date=new.last_child.last_child.last_child.text_content)
             if news_date < last_acceptable_date:
                 print("All news from given period have been extracted.")
                 break
@@ -109,12 +105,13 @@ class LATimes():
         topic: str
     ) -> str:
         print("Obtaining the topic's id value.")
-        site_html = BeautifulSoup(request_response.text, 'html.parser')
-        html_topics = site_html.select('.checkbox-input-label')
+        site_html = HTMLParser(request_response.text)
+
+        html_topics = site_html.css(".checkbox-input-label")
         topic_id = ''
         for html_topic in html_topics:
-            if topic in html_topic.text:
-                topic_id = html_topic.contents[0].attrs['value']
+            if topic in html.unescape(html_topic.html):
+                topic_id = html_topic.child.attributes['value']
                 break
         return topic_id
 
@@ -134,14 +131,15 @@ class LATimes():
         }
         print("Extracting info from the new's HTML.")
 
-        news_object['image_path'] = self.data_handling.download_file(
-            url=new.contents[0].contents[0].contents[0].contents[3].attrs['src']
-        )
-        if not news_object['image_path']:
+        if new.child.child.child.last_child: # checks if a new has an image
+            news_object['picture_filename'] = self.data_handling.download_file(
+                url=new.child.child.child.last_child.prev.attributes['src']
+            )
+        if not news_object['picture_filename']:
             print("The robot failed to download the new's image.")
 
-        news_object['title'] = new.contents[0].next_sibling.contents[0].contents[3].text.strip()
-        news_object['description'] = new.contents[1].contents[1].text
+        news_object['title'] = new.last_child.child.last_child.prev.child.next.last_child.text_content
+        news_object['description'] = new.last_child.last_child.prev.child.text_content
 
         news_object = self.string_comparisons(
             news_object=news_object,

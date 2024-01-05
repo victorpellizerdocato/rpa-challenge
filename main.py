@@ -17,21 +17,21 @@ def lambda_handler(event):
     }
 lambda_handler({
     'Packages': [
-        {
-            "query": "Javier Milei",
-            "topic": "Politics",
-            "months_delta": 10
-        },
-        {
-            "query": "Bad Bunny",
-            "topic": "Music",
-            "months_delta": 2
-        },
-        {
-            "query": "Dwayne Johnson",
-            "topic": "Entertainment & Arts",
-            "months_delta": 1
-        },
+        # {
+        #     "query": "Javier Milei",
+        #     "topic": "Politics",
+        #     "months_delta": 10
+        # },
+        # {
+        #     "query": "Bad Bunny",
+        #     "topic": "Music",
+        #     "months_delta": 2
+        # },
+        # {
+        #     "query": "Dwayne Johnson",
+        #     "topic": "Entertainment & Arts",
+        #     "months_delta": 1
+        # },
         {
             "query": "COVID",
             "topic": "Politics",
