@@ -13,10 +13,10 @@ class DataHandling:
         months_delta: int
     ) -> datetime:
         print("Defining the last month to look for news.")
-        now = datetime.utcnow()
         if months_delta <= 1:
-            return now
-        last_acceptable_date = datetime.today() - relativedelta(months=months_delta-1)
+            last_acceptable_date =  datetime.utcnow().replace(day=1, hour=0)
+        else:
+            last_acceptable_date = datetime.today() - relativedelta(months=months_delta-1)
         return last_acceptable_date
 
     def date_filter(
@@ -45,7 +45,8 @@ class DataHandling:
 
     def download_file(
         url: str,
-        date: str
+        date: str,
+        query: str
     ) -> str:
         print("Downloading the new's image.")
         download_response = requests.get(
@@ -54,7 +55,7 @@ class DataHandling:
         if download_response and download_response.status_code != 200:
             return ''
 
-        path = f'./cache/image-{date}-{random.randint(100000,999999)}.png'
+        path = f'./output/{query}-image-{date}-{random.randint(100000,999999)}.png'
         open(path, "wb").write(download_response.content)
 
         return os.path.abspath(path)
@@ -110,6 +111,6 @@ class DataHandling:
                     value=process[header[index]]
                 )
 
-        sheet_path = f'./cache/{sheet_name}.xlsx'
+        sheet_path = f'./output/{sheet_name}.xlsx'
         wb.save(sheet_path)
         return sheet_path
