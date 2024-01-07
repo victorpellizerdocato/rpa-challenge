@@ -4,7 +4,7 @@
 This robot accesses a given general news website, apply some filters and then gather information from news.
 
 ## Params
-It receives a dict with 3 indexes:
+It receives a JSON dict list with 3 indexes each:
 
 query - the query you want the robot to search for
 
