@@ -1,24 +1,34 @@
-{
-    "Packages": [
-        {
+[
+    {
+        "payload": {
             "query": "Javier Milei",
             "topic": "Politics",
             "months_delta": 10
         },
-        {
+        "files": {}
+    },
+    {
+        "payload": {
             "query": "Bad Bunny",
             "topic": "Music",
             "months_delta": 2
         },
-        {
+        "files": {}
+    },
+    {
+        "payload": {
             "query": "Dwayne Johnson",
             "topic": "Entertainment & Arts",
             "months_delta": 1
         },
-        {
+        "files": {}
+    },
+    {
+        "payload": {
             "query": "COVID",
             "topic": "Politics",
             "months_delta": 12
-        }
-    ]
-}
+        },
+        "files": {}
+    }
+]

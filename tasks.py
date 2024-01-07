@@ -1,15 +1,15 @@
 import json
 from src.challenge.ChallengeServiceHandler import ChallengeServiceHandler
 from robocorp.tasks import task
+from robocorp import workitems
 
 @task
 def solve_challenge():
     challenge = ChallengeServiceHandler()
-    input_json = json.load(open("./input_data.json"))
 
     print("Starting bot execution")
-    for package in input_json['Packages']:
-        print(f"Execution params: {package}")
-        challenge.handler(package)
+    for work_item in workitems.inputs:
+        print(f"Execution params: {work_item.payload}")
+        challenge.handler(work_item.payload)
 
     print("Bot execution finished.")
