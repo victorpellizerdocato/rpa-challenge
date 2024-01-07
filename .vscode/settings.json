@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "/home/docato/Projetos/victor-iritsu/."
+    ],
+    "python.terminal.activateEnvironment": false
+}

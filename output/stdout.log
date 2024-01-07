@@ -1,0 +1,114 @@
+
+Collecting tasks from: main.py
+=========================== Running: [96mlambda_handler[0m ============================
+Starting bot execution
+Execution params: {'query': 'Javier Milei', 'topic': 'Politics', 'months_delta': 10}
+Extracting info from LATimes.
+Obtaining the topic's id value.
+Generating the search endpoint.
+Accessing the result page
+Defining the last month to look for news.
+Converting the news' date format to datetime format.
+Extracting info from the new's HTML.
+Downloading the new's image.
+Scraping the new's title and description to find mentions to the search query and money.
+Converting the news' date format to datetime format.
+Extracting info from the new's HTML.
+Downloading the new's image.
+Scraping the new's title and description to find mentions to the search query and money.
+Converting the news' date format to datetime format.
+All news from given period have been extracted.
+Building sheet with the extracted data.
+[{'picture_filename': '/home/docato/Projetos/victor-iritsu/cache/Javier Milei-image-2023_12_19-242491.png', 'title': 'One of California’s largest ICE detention centers could close. Staff urge Biden to keep it open', 'description': 'Unionized workers at the ICE immigrant detention center in Adelanto are urging the federal government not to shut it down.', 'date': '12/19/2023', 'search_phrase_count': 0, 'contains_money': False}, {'picture_filename': '/home/docato/Projetos/victor-iritsu/cache/Javier Milei-image-2023_05_31-369028.png', 'title': 'Ex-GOP candidate faces federal indictment in shootings targeting 4 Democratic officials’ homes', 'description': 'A failed political candidate in New Mexico has been indicted on federal charges, including interfering with the electoral process, in a series of drive-by shootings.', 'date': '05/31/2023', 'search_phrase_count': 0, 'contains_money': False}]
+Successfully created the datasheet ./cache/Javier%20Milei_Politics_delta_10.xlsx.
+Execution params: {'query': 'Bad Bunny', 'topic': 'Music', 'months_delta': 2}
+Extracting info from LATimes.
+Obtaining the topic's id value.
+Generating the search endpoint.
+Accessing the result page
+Defining the last month to look for news.
+Converting the news' date format to datetime format.
+Extracting info from the new's HTML.
+Downloading the new's image.
+Scraping the new's title and description to find mentions to the search query and money.
+Converting the news' date format to datetime format.
+Extracting info from the new's HTML.
+Downloading the new's image.
+Scraping the new's title and description to find mentions to the search query and money.
+Converting the news' date format to datetime format.
+Extracting info from the new's HTML.
+Downloading the new's image.
+Scraping the new's title and description to find mentions to the search query and money.
+Converting the news' date format to datetime format.
+Extracting info from the new's HTML.
+Downloading the new's image.
+Scraping the new's title and description to find mentions to the search query and money.
+Converting the news' date format to datetime format.
+All news from given period have been extracted.
+Building sheet with the extracted data.
+[{'picture_filename': '/home/docato/Projetos/victor-iritsu/cache/Bad Bunny-image-2024_01_04-885465.png', 'title': 'Rage Against the Machine will not tour or play live again, drummer Brad Wilk says', 'description': 'Rage Against the Machine drummer Brad Wilk announced Wednesday that the rock band will not be touring again. ', 'date': '01/04/2024', 'search_phrase_count': 0, 'contains_money': False}, {'picture_filename': '/home/docato/Projetos/victor-iritsu/cache/Bad Bunny-image-2023_12_13-526849.png', 'title': 'Behind the calamitous fall of hip-hop mogul Sean ‘Diddy’ Combs', 'description': 'In the wake of multiple lawsuits filed against him, former members of Combs’ inner circle told The Times that his alleged misconduct against women goes back decades. ', 'date': '12/13/2023', 'search_phrase_count': 0, 'contains_money': False}, {'picture_filename': '/home/docato/Projetos/victor-iritsu/cache/Bad Bunny-image-2023_12_13-451554.png', 'title': 'No ‘Guts,’ no glory: How Olivia Rodrigo became America’s pop-punk queen', 'description': 'Nominated for six Grammy Awards, 20-year-old Olivia Rodrigo is set to embark on her first-ever arena tour: ‘I need to work on my death-metal scream.’', 'date': '12/13/2023', 'search_phrase_count': 0, 'contains_money': False}, {'picture_filename': '/home/docato/Projetos/victor-iritsu/cache/Bad Bunny-image-2023_12_12-567311.png', 'title': 'His music is still hard as nails. But nowadays, Josh Homme loves a good cry', 'description': 'The Queens of the Stone Age frontman has recently survived cancer, the deaths of close friends and a protracted custody battle. The result? ‘A flood of emotion.’', 'date': '12/12/2023', 'search_phrase_count': 0, 'contains_money': False}]
+Successfully created the datasheet ./cache/Bad%20Bunny_Music_delta_2.xlsx.
+Execution params: {'query': 'Dwayne Johnson', 'topic': 'Entertainment & Arts', 'months_delta': 1}
+Extracting info from LATimes.
+Obtaining the topic's id value.
+Generating the search endpoint.
+Accessing the result page
+Defining the last month to look for news.
+Converting the news' date format to datetime format.
+All news from given period have been extracted.
+Building sheet with the extracted data.
+[]
+Successfully created the datasheet ./cache/Dwayne%20Johnson_Entertainment & Arts_delta_1.xlsx.
+Execution params: {'query': 'COVID', 'topic': 'Politics', 'months_delta': 12}
+Extracting info from LATimes.
+Obtaining the topic's id value.
+Generating the search endpoint.
+Accessing the result page
+Defining the last month to look for news.
+Converting the news' date format to datetime format.
+Extracting info from the new's HTML.
+Downloading the new's image.
+Scraping the new's title and description to find mentions to the search query and money.
+Converting the news' date format to datetime format.
+Extracting info from the new's HTML.
+Downloading the new's image.
+Scraping the new's title and description to find mentions to the search query and money.
+Converting the news' date format to datetime format.
+Extracting info from the new's HTML.
+Downloading the new's image.
+Scraping the new's title and description to find mentions to the search query and money.
+Converting the news' date format to datetime format.
+Extracting info from the new's HTML.
+Downloading the new's image.
+Scraping the new's title and description to find mentions to the search query and money.
+Converting the news' date format to datetime format.
+Extracting info from the new's HTML.
+The robot failed to download the new's image.
+Scraping the new's title and description to find mentions to the search query and money.
+Converting the news' date format to datetime format.
+Extracting info from the new's HTML.
+Downloading the new's image.
+Scraping the new's title and description to find mentions to the search query and money.
+Converting the news' date format to datetime format.
+Extracting info from the new's HTML.
+Downloading the new's image.
+Scraping the new's title and description to find mentions to the search query and money.
+Converting the news' date format to datetime format.
+Extracting info from the new's HTML.
+Downloading the new's image.
+Scraping the new's title and description to find mentions to the search query and money.
+Converting the news' date format to datetime format.
+Extracting info from the new's HTML.
+Downloading the new's image.
+Scraping the new's title and description to find mentions to the search query and money.
+Converting the news' date format to datetime format.
+Extracting info from the new's HTML.
+Downloading the new's image.
+Scraping the new's title and description to find mentions to the search query and money.
+Building sheet with the extracted data.
+[{'picture_filename': '/home/docato/Projetos/victor-iritsu/cache/COVID-image-2024_01_05-600981.png', 'title': 'These four questions will decide who wins Biden vs. Trump — Part II', 'description': 'Crime is down, the economy is up, the incumbent is unpopular. We’re headed for another very close presidential election. Here’s why. ', 'date': '01/05/2024', 'search_phrase_count': 0, 'contains_money': False}, {'picture_filename': '/home/docato/Projetos/victor-iritsu/cache/COVID-image-2024_01_04-157066.png', 'title': 'A Los Angeles man was denied a green card over his tattoos. The Supreme Court might take up his case ', 'description': 'Attorney Sandra Muñoz and her husband, Luis Acensio Cordero, have sued the federal government after it denied him a visa, in part, over his tattoos.', 'date': '01/04/2024', 'search_phrase_count': 0, 'contains_money': False}, {'picture_filename': '/home/docato/Projetos/victor-iritsu/cache/COVID-image-2024_01_04-767962.png', 'title': '‘How are we going to defend ourselves?’ Inside the Capitol during the Jan. 6 insurrection', 'description': 'Three years ago, Times reporter Sarah D. Wire wrote about her experience inside the Capitol on Jan. 6, 2021. Now, with the aid of surveillance footage recently made available by the House and additional firsthand accounts, Wire provides a more expansive view of that day. ', 'date': '01/04/2024', 'search_phrase_count': 0, 'contains_money': False}, {'picture_filename': '/home/docato/Projetos/victor-iritsu/cache/COVID-image-2023_12_19-535202.png', 'title': 'One of California’s largest ICE detention centers could close. Staff urge Biden to keep it open', 'description': 'Unionized workers at the ICE immigrant detention center in Adelanto are urging the federal government not to shut it down.', 'date': '12/19/2023', 'search_phrase_count': 0, 'contains_money': False}, {'picture_filename': '', 'title': 'Think Biden’s doing badly? Check out the polling for these other Western leaders', 'description': 'President Biden’s standing in polls is bad — generating panic among many Democrats and a raft of theories about what’s wrong. ', 'date': '12/17/2023', 'search_phrase_count': 0, 'contains_money': False}, {'picture_filename': '/home/docato/Projetos/victor-iritsu/cache/COVID-image-2023_12_15-844379.png', 'title': 'Think Biden’s doing badly? Check out the polling for these other Western leaders', 'description': 'President Biden does really badly in polls. But so do his fellow leaders of wealthy, advanced democracies. Biden outpaces most of them. The comparison suggests that the problem he faces has less to do with his age and other personal factors and more to do with the times in which he’s governing.', 'date': '12/15/2023', 'search_phrase_count': 0, 'contains_money': False}, {'picture_filename': '/home/docato/Projetos/victor-iritsu/cache/COVID-image-2023_12_13-355046.png', 'title': 'DeSantis bragged about a COVID study during Newsom debate. Not so fast, lead author says', 'description': 'Ron DeSantis cited a scientific journal as evidence Florida had a lower COVID death rate than California. The study’s author says that’s not the whole story. ', 'date': '12/13/2023', 'search_phrase_count': 2, 'contains_money': False}, {'picture_filename': '/home/docato/Projetos/victor-iritsu/cache/COVID-image-2023_11_30-704032.png', 'title': '4 takeaways from the Newsom-DeSantis debate on Fox News', 'description': 'California Gov. Gavin Newsom and Florida Gov. Ron DeSantis turned their feud over blue and red state policies personal Thursday.', 'date': '11/30/2023', 'search_phrase_count': 0, 'contains_money': False}, {'picture_filename': '/home/docato/Projetos/victor-iritsu/cache/COVID-image-2023_11_29-687840.png', 'title': '‘Woke,’ Disney and COVID-19: The Newsom-DeSantis debate ultimate bingo cards', 'description': 'The governors of California and Florida head for the Fox News debate stage in Georgia on Thursday. Here’s your shot to have a little fun using our printable bingo cards.', 'date': '11/29/2023', 'search_phrase_count': 0, 'contains_money': False}, {'picture_filename': '/home/docato/Projetos/victor-iritsu/cache/COVID-image-2023_11_29-257796.png', 'title': 'Newsom versus DeSantis: How, when and where to watch the governors debate', 'description': 'California Gov. Gavin Newsom and Florida Gov. Ron DeSantis will face off in a debate Thursday at 6 p.m. Pacific on Fox News Channel.', 'date': '11/29/2023', 'search_phrase_count': 0, 'contains_money': False}]
+Successfully created the datasheet ./cache/COVID_Politics_delta_12.xlsx.
+Bot execution finished.
+[96mlambda_handler[0m status: PASS
+================================================================================
+Robocorp Log (html): /home/docato/Projetos/victor-iritsu/output/log.html
