@@ -10,7 +10,7 @@ query - the query you want the robot to search for
 
 topic - the news topic
 
-months_delta - number of months for which you need to receive news
+months_delta - range of months you want to receive news from
 
 ## Features on v1.0
 1. Opens https://www.latimes.com/
