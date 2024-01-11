@@ -39,6 +39,8 @@ class DataHandling:
             'Nov': 11,
             'Dec': 12
         }
+        if 'hour' in date:
+            return datetime.today()
         split_date = date.split(' ')
         # the month sometimes is misspelled
         month = months[split_date[0].replace('.', '')]
