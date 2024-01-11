@@ -1,5 +1,6 @@
 import os
 import random
+import logging
 import requests
 from string import digits
 from openpyxl import Workbook
@@ -12,17 +13,18 @@ class DataHandling:
     def get_last_acceptable_date(
         months_delta: int
     ) -> datetime:
-        print("Defining the last month to look for news.")
+        logging.info("Defining the last month to look for news.")
         if months_delta <= 1:
-            last_acceptable_date =  datetime.utcnow().replace(day=1, hour=0)
+            last_acceptable_date = datetime.utcnow().replace(day=1, hour=0)
         else:
-            last_acceptable_date = datetime.today() - relativedelta(months=months_delta-1)
+            last_acceptable_date = datetime.today() - \
+                relativedelta(months=months_delta-1)
         return last_acceptable_date
 
     def date_filter(
         date: str
     ) -> datetime:
-        print("Converting the news' date format to datetime format.")
+        logging.info("Converting the news' date format to datetime format.")
         months = {
             'Jan': 1,
             'Feb': 2,
@@ -38,9 +40,11 @@ class DataHandling:
             'Dec': 12
         }
         split_date = date.split(' ')
-        month = months[split_date[0].replace('.','')] # the month sometimes is misspelled
-        day = split_date[1].replace(',','')
-        filtered_date = datetime.strptime(f"{day}/{month}/{split_date[2]}", "%d/%m/%Y")
+        # the month sometimes is misspelled
+        month = months[split_date[0].replace('.', '')]
+        day = split_date[1].replace(',', '')
+        filtered_date = datetime.strptime(
+            f"{day}/{month}/{split_date[2]}", "%d/%m/%Y")
         return filtered_date
 
     def download_file(
@@ -48,23 +52,38 @@ class DataHandling:
         date: str,
         query: str
     ) -> str:
-        print("Downloading the new's image.")
-        download_response = requests.get(
-            url=url
-        )
-        if download_response and download_response.status_code != 200:
-            return ''
+        download_file_response = {
+            'success': False
+        }
+        try:
+            logging.info("Downloading the new's image.")
+            download_response = requests.get(
+                url=url
+            )
+            if download_response and download_response.status_code != 200:
+                return ''
 
-        path = f'./output/{query}-image-{date}-{random.randint(100000,999999)}.png'
-        open(path, "wb").write(download_response.content)
+            file_name = f'{query}-{date}-{random.randint(1000,9999)}.png'
+            path = f'./output/{file_name}'
+            open(path, "wb").write(download_response.content)
+            file_size = os.path.getsize(path)
+            if file_size:
+                logging.info("Successfully downloaded the new's image.")
 
-        return os.path.abspath(path)
+            download_file_response.update({
+                'success': True,
+                'file_size': file_size,
+                'picture_filename': file_name
+            })
+
+        finally:
+            return download_file_response
 
     def build_sheet(
         extracted_data: list,
         sheet_name: str
     ) -> str:
-        print("Building sheet with the extracted data.")
+        logging.info("Building sheet with the extracted data.")
         header = [
             'picture_filename',
             'title',
@@ -80,7 +99,7 @@ class DataHandling:
             header_cells.append(f'{chr(index+65)}1')
         cell_number = str.maketrans('', '', digits)
 
-        print(extracted_data)
+        logging.info(f'Extracted data: {extracted_data}')
         wb = Workbook()
         ws = wb.active
 

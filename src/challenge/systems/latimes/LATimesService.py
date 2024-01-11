@@ -1,4 +1,5 @@
 import html
+import logging
 import requests
 from datetime import datetime
 from selectolax.parser import HTMLParser
@@ -12,6 +13,8 @@ class LATimes():
         data_handling: DataHandling
     ):
         self.data_handling = data_handling
+        self.file_count = 0
+        self.files_size = 0
 
     def exec(
         self,
@@ -25,11 +28,12 @@ class LATimes():
         request_response = requests.get(
             url=url,
             headers={
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleW\
+                ebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
             }
         )
         if not request_response or request_response.status_code != 200:
-            print("Error accessing LATimes.")
+            logging.error("Error accessing LATimes.")
             return exec_response
 
         topic_id = self.get_topic_id(
@@ -37,7 +41,7 @@ class LATimes():
             topic=package['topic']
         )
         if not topic_id:
-            print("Failed to obtain the topic's id.")
+            logging.error("Failed to obtain the topic's id.")
             return exec_response
 
         endpoint = self.endpoint_generate(
@@ -45,15 +49,16 @@ class LATimes():
             topic_id=topic_id,
         )
 
-        print("Accessing the result page")
+        logging.info("Accessing the result page")
         request_response = requests.get(
             url=url+endpoint,
             headers={
-                'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleW\
+                ebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
             }
         )
         if not request_response or request_response.status_code != 200:
-            print("Error accessing the result page.")
+            logging.error("Error accessing the result page.")
             return exec_response
 
         last_acceptable_date = self.data_handling.get_last_acceptable_date(
@@ -64,10 +69,13 @@ class LATimes():
 
         news = site_html.css(".promo-wrapper")
         extracted_data = []
+        SIZE_LIMIT = 20000000
         for new in news:
-            news_date = self.data_handling.date_filter(date=new.last_child.last_child.last_child.text_content)
+            news_date = self.data_handling.date_filter(
+                date=new.last_child.last_child.last_child.text_content)
+
             if news_date < last_acceptable_date:
-                print("All news from given period have been extracted.")
+                logging.info("All news from given period have been extracted")
                 break
             news_info = self.extract_from_html(
                 new=new,
@@ -75,13 +83,18 @@ class LATimes():
                 query=package['query']
             )
             extracted_data.append(news_info)
+            if self.file_count >= 50 or self.files_size >= SIZE_LIMIT:
+                logging.warning("The robot has reached its file limit.")
+                break
 
+        sheet_name = f"{quote(package['query'])}_{package['topic']}_"
+        sheet_name += f"delta_{package['months_delta']}"
         sheet_path = self.data_handling.build_sheet(
             extracted_data=extracted_data,
-            sheet_name=f"{quote(package['query'])}_{package['topic']}_delta_{package['months_delta']}"
+            sheet_name=sheet_name
         )
         if sheet_path:
-            print(f"Successfully created the datasheet {sheet_path}.")
+            logging.info(f"Successfully created the sheet file {sheet_name}.")
             exec_response.update({
                 'sheet_path': sheet_path,
                 'success': True
@@ -94,9 +107,11 @@ class LATimes():
         query: str,
         topic_id: str
     ) -> str:
-        print("Generating the search endpoint.")
+        logging.info("Generating the search endpoint.")
         sort_by_newest_param = 1
-        endpoint = f"?q={quote_plus(query)}&f0={topic_id}&s={sort_by_newest_param}"
+        endpoint = f"?q={quote_plus(query)}"
+        endpoint += f"&f0={topic_id}"
+        endpoint += f"&s={sort_by_newest_param}"
         return endpoint
 
     def get_topic_id(
@@ -104,7 +119,7 @@ class LATimes():
         request_response,
         topic: str
     ) -> str:
-        print("Obtaining the topic's id value.")
+        logging.info("Obtaining the topic's id value.")
         site_html = HTMLParser(request_response.text)
 
         html_topics = site_html.css(".checkbox-input-label")
@@ -129,19 +144,26 @@ class LATimes():
             'search_phrase_count': 0,
             'contains_money': False
         }
-        print("Extracting info from the new's HTML.")
+        logging.info("Extracting info from the new's HTML.")
 
-        if new.child.child.child.last_child: # checks if a new has an image
-            news_object['picture_filename'] = self.data_handling.download_file(
+        if new.child.child.child.last_child:  # checks if a new has an image
+            download_response = self.data_handling.download_file(
                 url=new.child.child.child.last_child.prev.attributes['src'],
                 date=date.strftime("%Y_%m_%d"),
                 query=query
             )
-        if not news_object['picture_filename']:
-            print("The robot failed to download the new's image.")
+            if not download_response.get('success'):
+                logging.error("The robot failed to download the new's image.")
+            else:
+                news_object['picture_filename'] = download_response.get(
+                    'picture_filename')
+                self.file_count += 1
+                self.files_size += download_response['file_size']
 
-        news_object['title'] = new.last_child.child.last_child.prev.child.next.last_child.text_content
-        news_object['description'] = new.last_child.last_child.prev.child.text_content
+        news_object['title'] = new.last_child.child.last_child.prev.child.\
+            next.last_child.text_content
+        news_object['description'] = new.last_child.last_child.prev.child.\
+            text_content
 
         news_object = self.string_comparisons(
             news_object=news_object,
@@ -157,8 +179,10 @@ class LATimes():
         news_object: dict,
         query: str
     ) -> dict:
-        print("Scraping the new's title and description to find mentions to the search query and money.")
-        split_strings = f"{news_object.get('title')} {news_object.get('description')}".split(' ')
+        logging.info("Scraping the new's title and description to find \
+            mentions to the search query and money.")
+        split_strings = f"{news_object.get('title')} \
+            {news_object.get('description')}".split(' ')
 
         split_query = query.split(' ')
 
@@ -170,17 +194,21 @@ class LATimes():
 
         index = 0
         while index < len(split_strings):
-            for j in money_signs: # search the big text for money signs
+            for j in money_signs:  # search the big text for money signs
                 if split_strings[index] == j:
                     news_object['contains_money'] = True
                     break
             if split_strings[index] == split_query[0]:
                 query_index = 1
-                while query_index < len(split_query): # iterates through every split part of the search term in the big text
-                    if split_strings[index+query_index] != split_query[query_index]:
+                # iterates through every split part of the search term
+                # in the big text
+                while query_index < len(split_query):
+                    if split_strings[index+query_index] != \
+                            split_query[query_index]:
                         break
                     query_index += 1
-                if query_index ==  len(split_query): # if the whole search term is found, the counter is increased
+                # if the whole search term is found, the counter is increased
+                if query_index == len(split_query):
                     news_object['search_phrase_count'] += 1
             index += 1
 
