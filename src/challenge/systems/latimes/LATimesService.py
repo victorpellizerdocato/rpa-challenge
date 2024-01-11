@@ -1,8 +1,9 @@
 import logging
-from selenium import webdriver
-from selenium.webdriver.common.by import By
 from datetime import datetime
+from selenium import webdriver
 from urllib.parse import quote_plus, quote
+from selenium.webdriver.common.by import By
+from selenium.webdriver import FirefoxOptions
 from src.challenge.utils.data_handling import DataHandling
 
 
@@ -28,13 +29,15 @@ class LATimes():
             'success': False
         }
         try:
-            driver = webdriver.Firefox()
+            opts = FirefoxOptions()
+            opts.add_argument("--headless")
+            self.driver = webdriver.Firefox(options=opts)
             base_url = 'https://www.latimes.com/'
 
             logging.info("Accessing the default search page.")
-            driver.get(base_url+'search')
+            self.driver.get(base_url+'search')
 
-            html_topics = driver.find_elements(
+            html_topics = self.driver.find_elements(
                 By.XPATH, "//label[@class='checkbox-input-label']/input")
             topic_id = self.get_topic_id(
                 html_topics=html_topics,
@@ -50,7 +53,7 @@ class LATimes():
             )
 
             logging.info("Accessing the search result page.")
-            driver.get(base_url+endpoint)
+            self.driver.get(base_url+endpoint)
 
             last_acceptable_date = self.data_handling.get_last_acceptable_date(
                 months_delta=package['months_delta']
@@ -58,8 +61,7 @@ class LATimes():
 
             extracted_data = self.extract_from_html(
                 last_acceptable_date=last_acceptable_date,
-                query=package['query'],
-                driver=driver
+                query=package['query']
             )
 
             sheet_name = f"{quote(package['query'])}_{package['topic']}_"
@@ -77,19 +79,18 @@ class LATimes():
                 })
 
         finally:
-            driver.close()
+            self.driver.close()
             return exec_response
 
     def extract_from_html(
         self,
         last_acceptable_date: datetime,
-        query: str,
-        driver
+        query: str
     ) -> list:
         try:
             index = 0
             extracted_data = []
-            news = driver.find_elements(By.CLASS_NAME, "promo-wrapper")
+            news = self.driver.find_elements(By.CLASS_NAME, "promo-wrapper")
             while index < len(news):
                 news_object = {
                     'picture_filename': '',
@@ -100,7 +101,7 @@ class LATimes():
                     'contains_money': False
                 }
                 news_date = self.data_handling.date_filter(
-                    date=driver.find_elements(
+                    date=self.driver.find_elements(
                         By.XPATH, "//p[@class='promo-timestamp']")[index].text
                 )
                 if news_date < last_acceptable_date:
@@ -111,7 +112,7 @@ class LATimes():
                 logging.info("Extracting info from the new's HTML.")
 
                 download_response = self.data_handling.download_file(
-                    url=driver.find_elements(
+                    url=self.driver.find_elements(
                         By.XPATH, "//div[@class='promo-media']//img")[
                             index].get_attribute('src'),
                     date=news_date.strftime("%Y_%m_%d"),
@@ -126,9 +127,9 @@ class LATimes():
                     self.file_count += 1
                     self.files_size += download_response['file_size']
 
-                news_object['title'] = driver.find_elements(
+                news_object['title'] = self.driver.find_elements(
                     By.XPATH, "//h3[@class='promo-title']")[index].text
-                news_object['description'] = driver.find_elements(
+                news_object['description'] = self.driver.find_elements(
                     By.XPATH, "//p[@class='promo-description']")[index].text
 
                 news_object = self.string_comparisons(
