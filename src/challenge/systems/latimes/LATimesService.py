@@ -1,9 +1,8 @@
+import os
 import logging
 from datetime import datetime
-from selenium import webdriver
+from RPA.Browser.Selenium import Selenium
 from urllib.parse import quote_plus, quote
-from selenium.webdriver.common.by import By
-from selenium.webdriver import FirefoxOptions
 from src.challenge.utils.data_handling import DataHandling
 
 
@@ -29,16 +28,17 @@ class LATimes():
             'success': False
         }
         try:
-            opts = FirefoxOptions()
-            opts.add_argument("--headless")
-            self.driver = webdriver.Firefox(options=opts)
             base_url = 'https://www.latimes.com/'
 
-            logging.info("Accessing the default search page.")
-            self.driver.get(base_url+'search')
+            self.browser = Selenium()
+            self.browser.open_browser(
+                url=base_url+'search',
+                service_log_path=os.path.devnull
+            )
 
-            html_topics = self.driver.find_elements(
-                By.XPATH, "//label[@class='checkbox-input-label']/input")
+            logging.info("Accessing the default search page.")
+            html_topics = self.browser.find_elements(
+                "xpath://label[@class='checkbox-input-label']/input")
             topic_id = self.get_topic_id(
                 html_topics=html_topics,
                 topic=package['topic']
@@ -53,7 +53,10 @@ class LATimes():
             )
 
             logging.info("Accessing the search result page.")
-            self.driver.get(base_url+endpoint)
+            self.browser.open_browser(
+                url=base_url+endpoint,
+                service_log_path=os.path.devnull
+            )
 
             last_acceptable_date = self.data_handling.get_last_acceptable_date(
                 months_delta=package['months_delta']
@@ -79,7 +82,7 @@ class LATimes():
                 })
 
         finally:
-            self.driver.close()
+            self.browser.close_all_browsers()
             return exec_response
 
     def extract_from_html(
@@ -90,7 +93,7 @@ class LATimes():
         try:
             index = 0
             extracted_data = []
-            news = self.driver.find_elements(By.CLASS_NAME, "promo-wrapper")
+            news = self.browser.find_elements("class:promo-wrapper")
             while index < len(news):
                 news_object = {
                     'picture_filename': '',
@@ -101,8 +104,8 @@ class LATimes():
                     'contains_money': False
                 }
                 news_date = self.data_handling.date_filter(
-                    date=self.driver.find_elements(
-                        By.XPATH, "//p[@class='promo-timestamp']")[index].text
+                    date=self.browser.find_elements(
+                        "xpath://p[@class='promo-timestamp']")[index].text
                 )
                 if news_date < last_acceptable_date:
                     logging.info(
@@ -112,8 +115,8 @@ class LATimes():
                 logging.info("Extracting info from the new's HTML.")
 
                 download_response = self.data_handling.download_file(
-                    url=self.driver.find_elements(
-                        By.XPATH, "//div[@class='promo-media']//img")[
+                    url=self.browser.find_elements(
+                        "xpath://div[@class='promo-media']//img")[
                             index].get_attribute('src'),
                     date=news_date.strftime("%Y_%m_%d"),
                     query=query
@@ -127,10 +130,10 @@ class LATimes():
                     self.file_count += 1
                     self.files_size += download_response['file_size']
 
-                news_object['title'] = self.driver.find_elements(
-                    By.XPATH, "//h3[@class='promo-title']")[index].text
-                news_object['description'] = self.driver.find_elements(
-                    By.XPATH, "//p[@class='promo-description']")[index].text
+                news_object['title'] = self.browser.find_elements(
+                    "xpath://h3[@class='promo-title']")[index].text
+                news_object['description'] = self.browser.find_elements(
+                    "xpath://p[@class='promo-description']")[index].text
 
                 news_object = self.string_comparisons(
                     news_object=news_object,
