@@ -28,13 +28,13 @@ class LATimes():
             'success': False
         }
         try:
-            self.driver = webdriver.Firefox()
+            driver = webdriver.Firefox()
             base_url = 'https://www.latimes.com/'
 
             logging.info("Accessing the default search page.")
-            self.driver.get(base_url+'search')
+            driver.get(base_url+'search')
 
-            html_topics = self.driver.find_elements(
+            html_topics = driver.find_elements(
                 By.XPATH, "//label[@class='checkbox-input-label']/input")
             topic_id = self.get_topic_id(
                 html_topics=html_topics,
@@ -50,7 +50,7 @@ class LATimes():
             )
 
             logging.info("Accessing the search result page.")
-            self.driver.get(base_url+endpoint)
+            driver.get(base_url+endpoint)
 
             last_acceptable_date = self.data_handling.get_last_acceptable_date(
                 months_delta=package['months_delta']
@@ -58,7 +58,8 @@ class LATimes():
 
             extracted_data = self.extract_from_html(
                 last_acceptable_date=last_acceptable_date,
-                query=package['query']
+                query=package['query'],
+                driver=driver
             )
 
             sheet_name = f"{quote(package['query'])}_{package['topic']}_"
@@ -76,18 +77,19 @@ class LATimes():
                 })
 
         finally:
-            self.driver.close()
+            driver.close()
             return exec_response
 
     def extract_from_html(
         self,
         last_acceptable_date: datetime,
-        query: str
+        query: str,
+        driver
     ) -> list:
         try:
             index = 0
             extracted_data = []
-            news = self.driver.find_elements(By.CLASS_NAME, "promo-wrapper")
+            news = driver.find_elements(By.CLASS_NAME, "promo-wrapper")
             while index < len(news):
                 news_object = {
                     'picture_filename': '',
@@ -98,7 +100,7 @@ class LATimes():
                     'contains_money': False
                 }
                 news_date = self.data_handling.date_filter(
-                    date=self.driver.find_elements(
+                    date=driver.find_elements(
                         By.XPATH, "//p[@class='promo-timestamp']")[index].text
                 )
                 if news_date < last_acceptable_date:
@@ -109,7 +111,7 @@ class LATimes():
                 logging.info("Extracting info from the new's HTML.")
 
                 download_response = self.data_handling.download_file(
-                    url=self.driver.find_elements(
+                    url=driver.find_elements(
                         By.XPATH, "//div[@class='promo-media']//img")[
                             index].get_attribute('src'),
                     date=news_date.strftime("%Y_%m_%d"),
@@ -124,9 +126,9 @@ class LATimes():
                     self.file_count += 1
                     self.files_size += download_response['file_size']
 
-                news_object['title'] = self.driver.find_elements(
+                news_object['title'] = driver.find_elements(
                     By.XPATH, "//h3[@class='promo-title']")[index].text
-                news_object['description'] = self.driver.find_elements(
+                news_object['description'] = driver.find_elements(
                     By.XPATH, "//p[@class='promo-description']")[index].text
 
                 news_object = self.string_comparisons(
