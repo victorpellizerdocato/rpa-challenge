@@ -1,17 +1,17 @@
 import os
+import re
 import logging
 from datetime import datetime
 from RPA.Browser.Selenium import Selenium
 from urllib.parse import quote_plus, quote
-from src.challenge.utils.data_handling import DataHandling
+from src.utils.data_handling import DataHandling
 
 
-class LATimes():
+class LATimesService():
     def __init__(
-        self,
-        data_handling: DataHandling
+        self
     ):
-        self.data_handling = data_handling
+        self.data_handling = DataHandling
         self.file_count = 3
         # file_count starts with 3 because I considered the 2 default
         # output files and the resulting sheet file.
@@ -22,7 +22,7 @@ class LATimes():
 
     def exec(
         self,
-        package: dict
+        payload: dict
     ) -> dict:
         exec_response = {
             'success': False
@@ -39,16 +39,17 @@ class LATimes():
             logging.info("Accessing the default search page.")
             html_topics = self.browser.find_elements(
                 "xpath://label[@class='checkbox-input-label']/input")
+
             topic_id = self.get_topic_id(
                 html_topics=html_topics,
-                topic=package['topic']
+                topic=payload['topic']
             )
             if not topic_id:
                 logging.error("Failed to obtain the topic's id.")
                 return exec_response
 
             endpoint = self.endpoint_generate(
-                query=package['query'],
+                query=payload['query'],
                 topic_id=topic_id,
             )
 
@@ -59,16 +60,16 @@ class LATimes():
             )
 
             last_acceptable_date = self.data_handling.get_last_acceptable_date(
-                months_delta=package['months_delta']
+                months_delta=payload['months_delta']
             )
 
             extracted_data = self.extract_from_html(
                 last_acceptable_date=last_acceptable_date,
-                query=package['query']
+                query=payload['query']
             )
 
-            sheet_name = f"{quote(package['query'])}_{package['topic']}_"
-            sheet_name += f"delta_{package['months_delta']}"
+            sheet_name = f"{quote(payload['query'])}_{payload['topic']}_"
+            sheet_name += f"delta_{payload['months_delta']}"
             sheet_path = self.data_handling.build_sheet(
                 extracted_data=extracted_data,
                 sheet_name=sheet_name
@@ -77,7 +78,6 @@ class LATimes():
                 logging.info(
                     f"Successfully created the sheet file {sheet_name}.")
                 exec_response.update({
-                    'sheet_path': sheet_path,
                     'success': True
                 })
 
@@ -139,7 +139,6 @@ class LATimes():
                     news_object=news_object,
                     query=query
                 )
-
                 news_object['date'] = news_date.strftime("%m/%d/%Y")
 
                 extracted_data.append(news_object)
@@ -184,35 +183,14 @@ class LATimes():
         message = "Scraping the new's title and description to find"
         message += "mentions to the search query and money."
         logging.info(message)
-        split_strings = f"{news_object.get('title')} \
-            {news_object.get('description')}".split(' ')
+        mixed_strings = f"{news_object.get('title')} "
+        mixed_strings += f"{news_object.get('description')}"
+        news_object['search_phrase_count'] = len(
+            re.findall(query, mixed_strings))
 
-        split_query = query.split(' ')
-
-        money_signs = [
-            '$',
-            'dollars',
-            ' USD'
-        ]
-
-        index = 0
-        while index < len(split_strings):
-            for j in money_signs:  # search the big text for money signs
-                if split_strings[index] == j:
-                    news_object['contains_money'] = True
-                    break
-            if split_strings[index] == split_query[0]:
-                query_index = 1
-                # iterates through every split part of the search term
-                # in the big text
-                while query_index < len(split_query):
-                    if split_strings[index+query_index] != \
-                            split_query[query_index]:
-                        break
-                    query_index += 1
-                # if the whole search term is found, the counter is increased
-                if query_index == len(split_query):
-                    news_object['search_phrase_count'] += 1
-            index += 1
+        regex_pattern = r'(\$?([\d]{1,3}\,)?[\d]{1,3}\.[\d]{1,2}'
+        regex_pattern += r'|[\d]+ (dollars|USD))'
+        if re.search(regex_pattern, mixed_strings):
+            news_object['contains_money'] = True
 
         return news_object

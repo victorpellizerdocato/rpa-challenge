@@ -1,8 +1,8 @@
 import os
-import random
+import uuid
+import string
 import logging
 import requests
-from string import digits
 from openpyxl import Workbook
 from datetime import datetime
 from openpyxl.styles import PatternFill, Font
@@ -25,28 +25,10 @@ class DataHandling:
         date: str
     ) -> datetime:
         logging.info("Converting the news' date format to datetime format.")
-        months = {
-            'Jan': 1,
-            'Feb': 2,
-            'March': 3,
-            'April': 4,
-            'May': 5,
-            'June': 6,
-            'July': 7,
-            'Aug': 8,
-            'Sept': 9,
-            'Oct': 10,
-            'Nov': 11,
-            'Dec': 12
-        }
         if 'hour' in date:
             return datetime.today()
-        split_date = date.split(' ')
-        # the month sometimes is misspelled
-        month = months[split_date[0].replace('.', '')]
-        day = split_date[1].replace(',', '')
-        filtered_date = datetime.strptime(
-            f"{day}/{month}/{split_date[2]}", "%d/%m/%Y")
+        pattern = "%b. %d, %Y" if '.' in date else "%B %d, %Y"
+        filtered_date = datetime.strptime(date, pattern)
         return filtered_date
 
     def download_file(
@@ -65,9 +47,11 @@ class DataHandling:
             if download_response and download_response.status_code != 200:
                 return ''
 
-            file_name = f'{query}-{date}-{random.randint(1000,9999)}.png'
+            file_name = f'{query}-{date}-{uuid.uuid4().hex}.png'
             path = f'./output/{file_name}'
-            open(path, "wb").write(download_response.content)
+            file = open(path, "wb")
+            file.write(download_response.content)
+            file.close()
             file_size = os.path.getsize(path)
             if file_size:
                 logging.info("Successfully downloaded the new's image.")
@@ -98,8 +82,8 @@ class DataHandling:
         header_cells = []
 
         for index in range(header_len):
-            header_cells.append(f'{chr(index+65)}1')
-        cell_number = str.maketrans('', '', digits)
+            header_cells.append(string.ascii_uppercase[index]+'1')
+        cell_number = str.maketrans('', '', string.digits)
 
         logging.info(f'Extracted data: {extracted_data}')
         wb = Workbook()
