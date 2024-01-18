@@ -1,3 +1,17 @@
+"""
+
+> Packages used to start the robot execution
+
+logging - logs every relevant step
+os - path handling
+re - regex operations
+datetime - multiple date operations
+quote - changes whitespaces from queries
+quote_plus - changes whitespaces to '+' from queries to be used in the url
+Selenium - the browser used to scrape the web
+DataHandling - class to handle the data scraped from the web
+
+"""
 import logging
 import os
 import re
@@ -10,10 +24,13 @@ from src.utils.data_handling import DataHandling
 
 
 class LATimesService():
+    """
+    Class where the LATimes website is scraped for data
+    """
     def __init__(
         self
     ):
-        self.data_handling = DataHandling
+        self.data_handling = DataHandling()
         self.file_count = 3
         # file_count starts with 3 because I considered the 2 default
         # output files and the resulting sheet file.
@@ -21,18 +38,23 @@ class LATimesService():
         # files_size starts with this number because the sum of the
         # weight of the default output files is close to it.
         self.SIZE_LIMIT = 20000000
+        self.browser = Selenium()
 
     def exec(
         self,
         payload: dict
     ) -> dict:
+        """
+        The main method of the class: opens then closes the browser,
+        accesses the website, gathers HTML info, and calls the sheet
+        generator method
+        """
         exec_response = {
             'success': False
         }
         try:
             base_url = 'https://www.latimes.com/'
 
-            self.browser = Selenium()
             self.browser.open_browser(
                 url=base_url+'search',
                 service_log_path=os.path.devnull
@@ -81,7 +103,7 @@ class LATimesService():
             )
             if sheet_path:
                 logging.info(
-                    f"Successfully created the sheet file {sheet_name}.")
+                    "Successfully created the sheet file %s", sheet_name)
                 exec_response.update({
                     'success': True
                 })
@@ -94,6 +116,9 @@ class LATimesService():
         last_acceptable_date: datetime,
         query: str
     ) -> list:
+        """
+        Scrapes through the endpoint to gather data
+        """
         try:
             index = 0
             extracted_data = []
@@ -134,8 +159,7 @@ class LATimesService():
                         "xpath://div[@class='promo-media']//img")[
                             index].get_attribute('src'),
                     date=news_date.strftime("%Y_%m_%d"),
-                    query=query,
-                    # browser=self.browser
+                    query=query
                 )
                 if not download_response.get('success'):
                     logging.error(
@@ -160,6 +184,9 @@ class LATimesService():
         query: str,
         topic_id: str
     ) -> str:
+        """
+        Generates the search url's endpoint
+        """
         logging.info("Generating the search endpoint.")
         sort_by_newest_param = 1
         endpoint = f"search?q={quote_plus(query)}"
@@ -172,7 +199,10 @@ class LATimesService():
         html_topics: list,
         topic: str
     ) -> str:
-        logging.info("Obtaining the topic's id value.")
+        """
+        Gathers the topic's id from the HTML
+        """
+        logging.info("Gathering the topic's id value.")
         topic_id = ''
         for html_topic in html_topics:
             if topic == html_topic.accessible_name:
@@ -185,6 +215,10 @@ class LATimesService():
         news_object: dict,
         query: str
     ) -> dict:
+        """
+        Scrapes the new's title and description to find mentions
+        to the search query and money.
+        """
         message = "Scraping the new's title and description to find"
         message += "mentions to the search query and money."
         logging.info(message)

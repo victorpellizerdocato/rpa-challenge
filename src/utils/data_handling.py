@@ -1,3 +1,20 @@
+"""
+
+> Packages used to handle general data
+
+logging - logs every relevant step
+os - path handling
+string - supplies the alphabet and digits
+uuid - generates a unique string
+datetime - multiple date operations
+quote - changes whitespaces from queries
+relativedelta - makes date comparison operations easier
+Workbook - represents the entire spreadsheet
+Font - define cell's font
+PatternFill - define cell's color
+Selenium - the browser used to scrape the web
+
+"""
 import logging
 import os
 import string
@@ -11,10 +28,17 @@ from openpyxl.styles import Font, PatternFill
 from RPA.Browser.Selenium import Selenium
 
 
-class DataHandling:
+class DataHandling():
+    """
+    Class where general data handling methods are placed
+    """
     def get_last_acceptable_date(
+        self,
         months_delta: int
     ) -> datetime:
+        """
+        Defines the last month to look for news
+        """
         logging.info("Defining the last month to look for news.")
         if months_delta <= 1:
             last_acceptable_date = datetime.utcnow().replace(day=1, hour=0)
@@ -24,8 +48,12 @@ class DataHandling:
         return last_acceptable_date
 
     def date_filter(
+        self,
         date: str
     ) -> datetime:
+        """
+        Converts the news' date format to datetime format
+        """
         logging.info("Converting the news' date format to datetime format.")
         if 'hour' in date:
             return datetime.today()
@@ -34,10 +62,14 @@ class DataHandling:
         return filtered_date
 
     def download_file(
+        self,
         url: str,
         date: str,
         query: str
     ) -> str:
+        """
+        Downloads the new's image
+        """
         download_file_response = {
             'success': False
         }
@@ -68,9 +100,13 @@ class DataHandling:
             return download_file_response
 
     def build_sheet(
+        self,
         extracted_data: list,
         sheet_name: str
     ) -> str:
+        """
+        Builds a sheet with the extracted data
+        """
         logging.info("Building sheet with the extracted data.")
         header = [
             'picture_filename',
@@ -87,7 +123,7 @@ class DataHandling:
             header_cells.append(string.ascii_uppercase[index]+'1')
         cell_number = str.maketrans('', '', string.digits)
 
-        logging.info(f'Extracted data: {extracted_data}')
+        logging.info("Extracted data: %s", extracted_data)
         wb = Workbook()
         ws = wb.active
 
