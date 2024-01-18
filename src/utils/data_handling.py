@@ -1,12 +1,14 @@
-import os
-import uuid
-import string
 import logging
-import requests
-from openpyxl import Workbook
+import os
+import string
+import uuid
 from datetime import datetime
-from openpyxl.styles import PatternFill, Font
+from urllib.parse import quote
+
 from dateutil.relativedelta import relativedelta
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill
+from RPA.Browser.Selenium import Selenium
 
 
 class DataHandling:
@@ -41,17 +43,17 @@ class DataHandling:
         }
         try:
             logging.info("Downloading the new's image.")
-            download_response = requests.get(
-                url=url
-            )
-            if download_response and download_response.status_code != 200:
-                return ''
+            file_name = f'{quote(query)}-{date}-{uuid.uuid4().hex}.png'
+            path = os.path.join('.', 'output', file_name)
 
-            file_name = f'{query}-{date}-{uuid.uuid4().hex}.png'
-            path = f'./output/{file_name}'
-            file = open(path, "wb")
-            file.write(download_response.content)
-            file.close()
+            browser = Selenium()
+            browser.open_browser(
+                url=url,
+                service_log_path=os.path.devnull
+            )
+            browser.screenshot(filename=path)
+            browser.close_browser()
+
             file_size = os.path.getsize(path)
             if file_size:
                 logging.info("Successfully downloaded the new's image.")
@@ -116,6 +118,6 @@ class DataHandling:
                     value=process[header[index]]
                 )
 
-        sheet_path = f'./output/{sheet_name}.xlsx'
+        sheet_path = os.path.join('.', 'output', sheet_name)
         wb.save(sheet_path)
         return sheet_path

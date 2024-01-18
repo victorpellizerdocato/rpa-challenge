@@ -1,6 +1,8 @@
 import logging
+
 from robocorp import workitems
 from robocorp.tasks import task
+
 from src.LATimesService import LATimesService
 
 
@@ -18,6 +20,6 @@ def solve_challenge():
         logging.info(f"Execution params: {work_item.payload}")
         exec_response = challenge.exec(payload=work_item.payload)
         if exec_response.get('success'):
-            logging.info(f"The bot executed successfully.")
+            logging.info("The bot executed successfully.")
 
     logging.info("Bot execution finished.")

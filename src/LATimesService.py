@@ -1,9 +1,11 @@
+import logging
 import os
 import re
-import logging
 from datetime import datetime
+from urllib.parse import quote, quote_plus
+
 from RPA.Browser.Selenium import Selenium
-from urllib.parse import quote_plus, quote
+
 from src.utils.data_handling import DataHandling
 
 
@@ -48,6 +50,8 @@ class LATimesService():
                 logging.error("Failed to obtain the topic's id.")
                 return exec_response
 
+            self.browser.close_browser()
+
             endpoint = self.endpoint_generate(
                 query=payload['query'],
                 topic_id=topic_id,
@@ -67,9 +71,10 @@ class LATimesService():
                 last_acceptable_date=last_acceptable_date,
                 query=payload['query']
             )
+            self.browser.close_browser()
 
             sheet_name = f"{quote(payload['query'])}_{payload['topic']}_"
-            sheet_name += f"delta_{payload['months_delta']}"
+            sheet_name += f"delta_{payload['months_delta']}.xlsx"
             sheet_path = self.data_handling.build_sheet(
                 extracted_data=extracted_data,
                 sheet_name=sheet_name
@@ -82,7 +87,6 @@ class LATimesService():
                 })
 
         finally:
-            self.browser.close_all_browsers()
             return exec_response
 
     def extract_from_html(
@@ -114,22 +118,6 @@ class LATimesService():
 
                 logging.info("Extracting info from the new's HTML.")
 
-                download_response = self.data_handling.download_file(
-                    url=self.browser.find_elements(
-                        "xpath://div[@class='promo-media']//img")[
-                            index].get_attribute('src'),
-                    date=news_date.strftime("%Y_%m_%d"),
-                    query=query
-                )
-                if not download_response.get('success'):
-                    logging.error(
-                        "The robot failed to download the new's image.")
-                else:
-                    news_object['picture_filename'] = download_response.get(
-                        'picture_filename')
-                    self.file_count += 1
-                    self.files_size += download_response['file_size']
-
                 news_object['title'] = self.browser.find_elements(
                     "xpath://h3[@class='promo-title']")[index].text
                 news_object['description'] = self.browser.find_elements(
@@ -140,6 +128,23 @@ class LATimesService():
                     query=query
                 )
                 news_object['date'] = news_date.strftime("%m/%d/%Y")
+
+                download_response = self.data_handling.download_file(
+                    url=self.browser.find_elements(
+                        "xpath://div[@class='promo-media']//img")[
+                            index].get_attribute('src'),
+                    date=news_date.strftime("%Y_%m_%d"),
+                    query=query,
+                    # browser=self.browser
+                )
+                if not download_response.get('success'):
+                    logging.error(
+                        "The robot failed to download the new's image.")
+                else:
+                    news_object['picture_filename'] = download_response.get(
+                        'picture_filename')
+                    self.file_count += 1
+                    self.files_size += download_response['file_size']
 
                 extracted_data.append(news_object)
                 if self.file_count >= 50 or self.files_size >= self.SIZE_LIMIT:
