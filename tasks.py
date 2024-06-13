@@ -32,8 +32,8 @@ def solve_challenge():
     logging.info("Starting bot execution")
     for work_item in workitems.inputs:
         logging.info("Execution params: %s", work_item.payload)
-        exec_response = challenge.exec(payload=work_item.payload)
-        if exec_response.get('success'):
+        challenge.exec(payload=work_item.payload)
+        if challenge.ok:
             logging.info("The bot executed successfully.")
 
     logging.info("Bot execution finished.")
